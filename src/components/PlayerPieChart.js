@@ -48,24 +48,25 @@ export default function PlayerPieChart({ player }) {
     <div
       style={{
         width: "100%",
-        height: "500px",
+        height: "650px",
         background: "#ffffff",
         borderRadius: "20px",
-        padding: "20px",
-        boxSizing: "border-box"
+        padding: "20px"
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart margin={{ top: 20, right: 20, bottom: 80, left: 20 }}>
+        <PieChart>
           <Pie
             data={data}
             dataKey="value"
             nameKey="name"
             cx="50%"
-            cy="45%"
-            innerRadius={60}
-            outerRadius={110}
+            cy="40%"
+            innerRadius={70}
+            outerRadius={150}
             paddingAngle={3}
+            label={({ name, value }) => `${name}: ${value}`}
+            labelLine={true}
           >
             {data.map((entry, index) => (
               <Cell
@@ -85,9 +86,9 @@ export default function PlayerPieChart({ player }) {
             layout="horizontal"
             iconType="circle"
             wrapperStyle={{
-              fontSize: "13px",
-              paddingTop: "20px",
-              lineHeight: "24px",
+              paddingTop: "50px",
+              fontSize: "15px",
+              fontWeight: "bold",
               color: "#000"
             }}
           />
