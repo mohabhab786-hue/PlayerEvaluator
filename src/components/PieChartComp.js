@@ -41,22 +41,20 @@ export default function PieChartComp() {
     <div
       style={{
         width: "100%",
-        height: "400px"
+        height: "350px"
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
+        <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <Pie
             data={data}
             dataKey="value"
             nameKey="name"
-            cx="40%"
+            cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={110}
-            label={({ percent }) =>
-              `${(percent * 100).toFixed(0)}%`
-            }
+            innerRadius={55}
+            outerRadius={90}
+            paddingAngle={3}
           >
             {data.map((entry, index) => (
               <Cell
@@ -72,12 +70,12 @@ export default function PieChartComp() {
             layout="vertical"
             verticalAlign="middle"
             align="right"
+            iconType="circle"
             wrapperStyle={{
-              fontSize: "12px",
-              width: "150px",
-              lineHeight: "18px",
-              wordBreak: "break-word",
-              color: "#fff"
+              fontSize: "13px",
+              lineHeight: "22px",
+              color: "#fff",
+              paddingLeft: "15px"
             }}
           />
         </PieChart>
