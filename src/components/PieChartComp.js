@@ -41,7 +41,7 @@ export default function PieChartComp() {
     <div
       style={{
         width: "100%",
-        height: "350px"
+        height: "420px"
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
@@ -50,11 +50,32 @@ export default function PieChartComp() {
             data={data}
             dataKey="value"
             nameKey="name"
-            cx="50%"
+            cx="40%"
             cy="50%"
             innerRadius={55}
-            outerRadius={90}
+            outerRadius={95}
             paddingAngle={3}
+            label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+              const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+              const x =
+                cx + radius * Math.cos((-midAngle * Math.PI) / 180);
+              const y =
+                cy + radius * Math.sin((-midAngle * Math.PI) / 180);
+
+              return (
+                <text
+                  x={x}
+                  y={y}
+                  fill="white"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize={12}
+                  fontWeight="bold"
+                >
+                  {`${(percent * 100).toFixed(0)}%`}
+                </text>
+              );
+            }}
           >
             {data.map((entry, index) => (
               <Cell
@@ -75,7 +96,7 @@ export default function PieChartComp() {
               fontSize: "13px",
               lineHeight: "22px",
               color: "#fff",
-              paddingLeft: "15px"
+              paddingLeft: "10px"
             }}
           />
         </PieChart>
