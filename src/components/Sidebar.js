@@ -12,6 +12,7 @@ export default function Sidebar() {
         color: "#fff"
       }}
     >
+      {/* HEADER */}
       <div
         style={{
           textAlign: "center",
@@ -47,6 +48,7 @@ export default function Sidebar() {
         </h2>
       </div>
 
+      {/* NAVIGATION */}
       <nav
         style={{
           display: "flex",
@@ -69,11 +71,21 @@ export default function Sidebar() {
         <Link style={linkStyle} to="/reports">
           📄 Reports
         </Link>
+
+        {/* NEW FEATURES */}
+        <Link style={linkStyle} to="/compare">
+          ⚔ Compare Players
+        </Link>
+
+        <Link style={linkStyle} to="/leaderboard">
+          🏆 Leaderboard
+        </Link>
       </nav>
     </div>
   );
 }
 
+/* STYLE */
 const linkStyle = {
   color: "#ffffff",
   textDecoration: "none",
@@ -82,5 +94,6 @@ const linkStyle = {
   padding: "14px",
   borderRadius: "10px",
   background: "#111827",
-  display: "block"
+  display: "block",
+  transition: "0.2s ease"
 };

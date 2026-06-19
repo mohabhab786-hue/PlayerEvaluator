@@ -48,11 +48,7 @@ export default function Players() {
 
   const handleSkillChange = (field, value) => {
     value = Number(value);
-
-    if (value > 10) {
-      alert("Maximum value allowed is 10");
-      return;
-    }
+    if (value > 10) return alert("Maximum value allowed is 10");
 
     setForm({
       ...form,
@@ -61,7 +57,7 @@ export default function Players() {
   };
 
   const saveEdit = () => {
-    const rating = (
+    const rating =
       (
         Number(form.gameAwareness) +
         Number(form.decisionMaking) +
@@ -69,16 +65,11 @@ export default function Players() {
         Number(form.adaptability) +
         Number(form.competitiveness) +
         Number(form.coachability)
-      ) / 6
-    ).toFixed(1);
+      ) / 6;
 
     const updated = players.map((p) =>
       p.id === editingId
-        ? {
-            ...p,
-            ...form,
-            rating: Number(rating)
-          }
+        ? { ...p, ...form, rating: Number(rating.toFixed(1)) }
         : p
     );
 
@@ -87,24 +78,86 @@ export default function Players() {
     setEditingId(null);
   };
 
+  // ✅ INSIGHTS ENGINE (UPGRADED)
+  const getInsights = (p) => {
+    const skills = [
+      { name: "Game Awareness", value: p.gameAwareness },
+      { name: "Decision Making", value: p.decisionMaking },
+      { name: "Pressure Handling", value: p.pressureHandling },
+      { name: "Adaptability", value: p.adaptability },
+      { name: "Competitiveness", value: p.competitiveness },
+      { name: "Coachability", value: p.coachability }
+    ];
+
+    let strengths = [];
+    let weaknesses = [];
+    let improvement = [];
+
+    let total = 0;
+
+    skills.forEach((s) => {
+      total += s.value;
+
+      if (s.value >= 8) strengths.push(s.name);
+      else if (s.value <= 5) {
+        weaknesses.push(s.name);
+        improvement.push(`Improve ${s.name}`);
+      }
+    });
+
+    const avg = total / skills.length;
+
+    let tier = "";
+    if (avg >= 8) tier = "ELITE PROSPECT";
+    else if (avg >= 6) tier = "GOOD POTENTIAL";
+    else tier = "DEVELOPMENT REQUIRED";
+
+    return { strengths, weaknesses, improvement, tier, avg };
+  };
+
+  // 🎨 VERDICT STYLE SYSTEM
+  const getVerdictStyle = (tier) => {
+    switch (tier) {
+      case "ELITE PROSPECT":
+        return {
+          color: "#22c55e",
+          background: "rgba(34,197,94,0.15)",
+          border: "1px solid #22c55e",
+          boxShadow: "0 0 12px rgba(34,197,94,0.3)"
+        };
+
+      case "GOOD POTENTIAL":
+        return {
+          color: "#38bdf8",
+          background: "rgba(56,189,248,0.15)",
+          border: "1px solid #38bdf8",
+          boxShadow: "0 0 12px rgba(56,189,248,0.3)"
+        };
+
+      default:
+        return {
+          color: "#ef4444",
+          background: "rgba(239,68,68,0.15)",
+          border: "1px solid #ef4444",
+          boxShadow: "0 0 12px rgba(239,68,68,0.3)"
+        };
+    }
+  };
+
   const filteredPlayers = players.filter((p) => {
     const matchesSearch = p.name
       .toLowerCase()
       .includes(search.toLowerCase());
-
-    const matchesRole =
-      roleFilter === "All" || p.role === roleFilter;
-
+    const matchesRole = roleFilter === "All" || p.role === roleFilter;
     return matchesSearch && matchesRole;
   });
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.title}>👤 Players Database</h1>
+      <h1 style={styles.title}>🏏 Players Database</h1>
 
       <div style={styles.filterRow}>
         <input
-          type="text"
           placeholder="Search Player..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -124,151 +177,129 @@ export default function Players() {
         </select>
       </div>
 
-      {filteredPlayers.map((p) => (
-        <div key={p.id} style={styles.card}>
-          {editingId === p.id ? (
-            <>
-              <input
-                style={styles.input}
-                value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
-              />
+      {filteredPlayers.map((p) => {
+        const ins = getInsights(p);
+        const verdictStyle = getVerdictStyle(ins.tier);
 
-              <input
-                style={styles.input}
-                value={form.age}
-                onChange={(e) =>
-                  setForm({ ...form, age: e.target.value })
-                }
-              />
+        return (
+          <div key={p.id} style={styles.card}>
+            {editingId === p.id ? (
+              <>
+                <input
+                  style={styles.input}
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
+                />
 
-              <input
-                style={styles.input}
-                value={form.role}
-                onChange={(e) =>
-                  setForm({ ...form, role: e.target.value })
-                }
-              />
+                <input
+                  style={styles.input}
+                  value={form.age}
+                  onChange={(e) =>
+                    setForm({ ...form, age: e.target.value })
+                  }
+                />
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.gameAwareness}
-                onChange={(e) =>
-                  handleSkillChange("gameAwareness", e.target.value)
-                }
-                placeholder="Game Awareness"
-              />
+                <input
+                  style={styles.input}
+                  value={form.role}
+                  onChange={(e) =>
+                    setForm({ ...form, role: e.target.value })
+                  }
+                />
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.decisionMaking}
-                onChange={(e) =>
-                  handleSkillChange("decisionMaking", e.target.value)
-                }
-                placeholder="Decision Making"
-              />
+                {Object.keys(form)
+                  .slice(3)
+                  .map((key) => (
+                    <input
+                      key={key}
+                      type="number"
+                      max="10"
+                      style={styles.input}
+                      value={form[key]}
+                      onChange={(e) =>
+                        handleSkillChange(key, e.target.value)
+                      }
+                    />
+                  ))}
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.pressureHandling}
-                onChange={(e) =>
-                  handleSkillChange("pressureHandling", e.target.value)
-                }
-                placeholder="Pressure Handling"
-              />
+                <button style={styles.saveBtn} onClick={saveEdit}>
+                  💾 Save
+                </button>
+              </>
+            ) : (
+              <>
+                <h2>{p.name}</h2>
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.adaptability}
-                onChange={(e) =>
-                  handleSkillChange("adaptability", e.target.value)
-                }
-                placeholder="Adaptability"
-              />
+                <p>Age: {p.age}</p>
+                <p>Role: {p.role}</p>
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.competitiveness}
-                onChange={(e) =>
-                  handleSkillChange("competitiveness", e.target.value)
-                }
-                placeholder="Competitiveness"
-              />
+                <p>⭐ Rating: {p.rating}/10</p>
 
-              <input
-                style={styles.input}
-                type="number"
-                max="10"
-                value={form.coachability}
-                onChange={(e) =>
-                  handleSkillChange("coachability", e.target.value)
-                }
-                placeholder="Coachability"
-              />
+                {/* 🧠 SCOUT VERDICT */}
+                <div style={{ marginTop: "10px" }}>
+                  <p
+                    style={{
+                      ...verdictStyle,
+                      padding: "8px 12px",
+                      borderRadius: "12px",
+                      display: "inline-block",
+                      fontWeight: "bold"
+                    }}
+                  >
+                    🧠 Scout Verdict: {ins.tier}
+                  </p>
 
-              <button style={styles.saveBtn} onClick={saveEdit}>
-                💾 Save Changes
-              </button>
-            </>
-          ) : (
-            <>
-              <h2>{p.name}</h2>
+                  <p style={{ color: "#facc15" }}>
+                    📊 Intelligence Score: {ins.avg.toFixed(1)}/10
+                  </p>
+                </div>
 
-              <p>Age: {p.age}</p>
-              <p>Role: {p.role}</p>
+                <p style={{ color: "#22c55e" }}>
+                  🟢 Strengths: {ins.strengths.join(", ") || "None"}
+                </p>
 
-              <p>Game Awareness: {p.gameAwareness}</p>
-              <p>Decision Making: {p.decisionMaking}</p>
-              <p>Pressure Handling: {p.pressureHandling}</p>
-              <p>Adaptability: {p.adaptability}</p>
-              <p>Competitiveness: {p.competitiveness}</p>
-              <p>Coachability: {p.coachability}</p>
+                <p style={{ color: "#ef4444" }}>
+                  🔴 Weaknesses: {ins.weaknesses.join(", ") || "None"}
+                </p>
 
-              <h3>⭐ Overall Rating: {p.rating}/10</h3>
+                <button
+                  style={styles.editBtn}
+                  onClick={() => startEdit(p)}
+                >
+                  ✏️ Edit
+                </button>
 
-              <button
-                style={styles.editBtn}
-                onClick={() => startEdit(p)}
-              >
-                ✏️ Edit
-              </button>
-
-              <button
-                style={styles.deleteBtn}
-                onClick={() => deletePlayer(p.id)}
-              >
-                ❌ Delete
-              </button>
-            </>
-          )}
-        </div>
-      ))}
+                <button
+                  style={styles.deleteBtn}
+                  onClick={() => deletePlayer(p.id)}
+                >
+                  ❌ Delete
+                </button>
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
+/* 🎨 STYLES */
 const styles = {
   page: {
     padding: "25px",
-    background: "#000",
+    background: "linear-gradient(135deg, #0f172a, #020617)",
     color: "#fff",
     minHeight: "100vh"
   },
 
   title: {
-    marginBottom: "20px"
+    fontSize: "28px",
+    fontWeight: "800",
+    marginBottom: "20px",
+    color: "#38bdf8"
   },
 
   filterRow: {
@@ -278,10 +309,11 @@ const styles = {
   },
 
   card: {
-    background: "#111827",
+    background: "linear-gradient(135deg, #111827, #0b1220)",
     padding: "20px",
-    borderRadius: "15px",
-    marginBottom: "20px"
+    borderRadius: "16px",
+    marginBottom: "20px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.4)"
   },
 
   input: {
@@ -296,17 +328,15 @@ const styles = {
 
   editBtn: {
     background: "#38bdf8",
-    color: "#fff",
     border: "none",
     padding: "10px 15px",
     borderRadius: "10px",
-    marginRight: "10px",
-    cursor: "pointer"
+    cursor: "pointer",
+    marginRight: "10px"
   },
 
   deleteBtn: {
     background: "#ef4444",
-    color: "#fff",
     border: "none",
     padding: "10px 15px",
     borderRadius: "10px",
@@ -315,11 +345,9 @@ const styles = {
 
   saveBtn: {
     background: "#22c55e",
-    color: "#fff",
     border: "none",
     padding: "12px",
     borderRadius: "10px",
-    cursor: "pointer",
     fontWeight: "bold"
   }
 };

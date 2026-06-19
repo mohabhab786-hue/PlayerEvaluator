@@ -6,6 +6,10 @@ import Players from "./pages/Players";
 import EvaluationForm from "./components/EvaluationForm";
 import Reports from "./pages/Reports";
 
+// ✅ NEW IMPORTS (SAFE ADD)
+import ComparePlayers from "./pages/ComparePlayers";
+import Leaderboard from "./pages/Leaderboard";
+
 export default function App() {
   return (
     <div style={{ display: "flex" }}>
@@ -25,6 +29,10 @@ export default function App() {
           <Route path="/players" element={<Players />} />
           <Route path="/evaluate" element={<EvaluationForm />} />
           <Route path="/reports" element={<Reports />} />
+
+          {/* ✅ NEW ROUTES ADDED */}
+          <Route path="/compare" element={<ComparePlayers />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
         </Routes>
       </div>
     </div>
