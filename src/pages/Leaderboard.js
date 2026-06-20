@@ -1,12 +1,25 @@
 import { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Leaderboard() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("players")) || [];
-    setPlayers(data);
-  }, []);
+  const unsubscribe = onSnapshot(
+    collection(db, "players"),
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setPlayers(data);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
 
   // 🏆 SORT PLAYERS BY RATING (IPL TABLE STYLE)
   const sortedPlayers = [...players].sort((a, b) => b.rating - a.rating);

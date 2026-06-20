@@ -1,4 +1,9 @@
 import { useEffect, useState } from "react";
+import { subscribeToPlayers } from "../data/players";
+import {
+  deletePlayer as deletePlayerFromDB,
+  updatePlayer
+} from "../utils/playerStorage";
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
@@ -19,17 +24,19 @@ export default function Players() {
     coachability: 5
   });
 
+  // 🔥 Real-time Firebase sync
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("players")) || [];
-    setPlayers(data);
+    const unsubscribe = subscribeToPlayers(setPlayers);
+
+    return () => unsubscribe();
   }, []);
 
-  const deletePlayer = (id) => {
-    const updated = players.filter((p) => p.id !== id);
-    localStorage.setItem("players", JSON.stringify(updated));
-    setPlayers(updated);
+  // ❌ Delete player
+  const deletePlayer = async (id) => {
+    await deletePlayerFromDB(id);
   };
 
+  // ✏️ Start editing
   const startEdit = (player) => {
     setEditingId(player.id);
 
@@ -48,7 +55,11 @@ export default function Players() {
 
   const handleSkillChange = (field, value) => {
     value = Number(value);
-    if (value > 10) return alert("Maximum value allowed is 10");
+
+    if (value > 10) {
+      alert("Maximum value allowed is 10");
+      return;
+    }
 
     setForm({
       ...form,
@@ -56,7 +67,8 @@ export default function Players() {
     });
   };
 
-  const saveEdit = () => {
+  // 💾 Save edited player
+  const saveEdit = async () => {
     const rating =
       (
         Number(form.gameAwareness) +
@@ -67,18 +79,16 @@ export default function Players() {
         Number(form.coachability)
       ) / 6;
 
-    const updated = players.map((p) =>
-      p.id === editingId
-        ? { ...p, ...form, rating: Number(rating.toFixed(1)) }
-        : p
-    );
+    await updatePlayer({
+      id: editingId,
+      ...form,
+      rating: Number(rating.toFixed(1))
+    });
 
-    localStorage.setItem("players", JSON.stringify(updated));
-    setPlayers(updated);
     setEditingId(null);
   };
 
-  // ✅ INSIGHTS ENGINE (UPGRADED)
+  // 🧠 Insights Engine
   const getInsights = (p) => {
     const skills = [
       { name: "Game Awareness", value: p.gameAwareness },
@@ -108,6 +118,7 @@ export default function Players() {
     const avg = total / skills.length;
 
     let tier = "";
+
     if (avg >= 8) tier = "ELITE PROSPECT";
     else if (avg >= 6) tier = "GOOD POTENTIAL";
     else tier = "DEVELOPMENT REQUIRED";
@@ -115,7 +126,6 @@ export default function Players() {
     return { strengths, weaknesses, improvement, tier, avg };
   };
 
-  // 🎨 VERDICT STYLE SYSTEM
   const getVerdictStyle = (tier) => {
     switch (tier) {
       case "ELITE PROSPECT":
@@ -148,11 +158,15 @@ export default function Players() {
     const matchesSearch = p.name
       .toLowerCase()
       .includes(search.toLowerCase());
-    const matchesRole = roleFilter === "All" || p.role === roleFilter;
+
+    const matchesRole =
+      roleFilter === "All" || p.role === roleFilter;
+
     return matchesSearch && matchesRole;
   });
 
-  return (
+  // PART 2 CONTINUES BELOW
+    return (
     <div style={styles.page}>
       <h1 style={styles.title}>🏏 Players Database</h1>
 
@@ -231,13 +245,10 @@ export default function Players() {
             ) : (
               <>
                 <h2>{p.name}</h2>
-
                 <p>Age: {p.age}</p>
                 <p>Role: {p.role}</p>
-
                 <p>⭐ Rating: {p.rating}/10</p>
 
-                {/* 🧠 SCOUT VERDICT */}
                 <div style={{ marginTop: "10px" }}>
                   <p
                     style={{
@@ -286,7 +297,6 @@ export default function Players() {
   );
 }
 
-/* 🎨 STYLES */
 const styles = {
   page: {
     padding: "25px",
@@ -348,6 +358,7 @@ const styles = {
     border: "none",
     padding: "12px",
     borderRadius: "10px",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    cursor: "pointer"
   }
 };

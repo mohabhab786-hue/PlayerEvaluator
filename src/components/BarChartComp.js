@@ -8,13 +8,33 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-export default function BarChartComp() {
-  const players = JSON.parse(localStorage.getItem("players")) || [];
+import { useState, useEffect } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
-  const data = players.map((p) => ({
-    name: p.name,
-    rating: p.rating
-  }));
+export default function BarChartComp() {
+  const [players, setPlayers] = useState([]);
+
+useEffect(() => {
+  const unsubscribe = onSnapshot(
+    collection(db, "players"),
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setPlayers(data);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
+
+const data = players.map((p) => ({
+  name: p.name,
+  rating: p.rating
+}));
 
   if (players.length === 0) {
     return <p style={{ color: "#aaa" }}>No players yet</p>;

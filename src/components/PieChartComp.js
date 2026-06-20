@@ -1,3 +1,5 @@
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 import {
   PieChart,
   Pie,
@@ -51,15 +53,25 @@ export default function PieChartComp() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const players = JSON.parse(localStorage.getItem("players")) || [];
+  const unsubscribe = onSnapshot(
+    collection(db, "players"),
+    (snapshot) => {
+      const players = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
 
-    const formatted = players.map((p) => ({
-      name: p.name,
-      value: Number(p.rating) || 0
-    }));
+      const formatted = players.map((p) => ({
+        name: p.name,
+        value: Number(p.rating) || 0
+      }));
 
-    setData(formatted);
-  }, []);
+      setData(formatted);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
 
   if (data.length === 0) {
     return <p style={{ color: "#fff" }}>No data available</p>;

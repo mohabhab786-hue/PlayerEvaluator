@@ -2,24 +2,49 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import PlayerPieChart from "../components/PlayerPieChart";
+import { subscribeToPlayers } from "../data/players";
 
 export default function Reports() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("players")) || [];
-    setPlayers(data);
+    const unsubscribe = subscribeToPlayers(setPlayers);
+    return () => unsubscribe();
   }, []);
 
   // 🧠 SCOUT ENGINE
   const getInsights = (player) => {
     const skills = [
-      { name: "Game Awareness", value: player.gameAwareness || 0, tip: "Watch match analysis videos and study field placements." },
-      { name: "Decision Making", value: player.decisionMaking || 0, tip: "Practice quick decision drills under pressure." },
-      { name: "Pressure Handling", value: player.pressureHandling || 0, tip: "Simulate match pressure situations in training." },
-      { name: "Adaptability", value: player.adaptability || 0, tip: "Play in different roles and conditions." },
-      { name: "Competitiveness", value: player.competitiveness || 0, tip: "Improve mindset with match challenges." },
-      { name: "Coachability", value: player.coachability || 0, tip: "Apply coach feedback consistently." }
+      {
+        name: "Game Awareness",
+        value: player.gameAwareness || 0,
+        tip: "Watch match analysis videos and study field placements."
+      },
+      {
+        name: "Decision Making",
+        value: player.decisionMaking || 0,
+        tip: "Practice quick decision drills under pressure."
+      },
+      {
+        name: "Pressure Handling",
+        value: player.pressureHandling || 0,
+        tip: "Simulate match pressure situations in training."
+      },
+      {
+        name: "Adaptability",
+        value: player.adaptability || 0,
+        tip: "Play in different roles and conditions."
+      },
+      {
+        name: "Competitiveness",
+        value: player.competitiveness || 0,
+        tip: "Improve mindset with match challenges."
+      },
+      {
+        name: "Coachability",
+        value: player.coachability || 0,
+        tip: "Apply coach feedback consistently."
+      }
     ];
 
     let strengths = [];
@@ -34,19 +59,28 @@ export default function Reports() {
       if (s.value >= 8) strengths.push(s.name);
 
       if (s.value <= 5) {
-        weaknesses.push({ name: s.name, tip: s.tip });
+        weaknesses.push({
+          name: s.name,
+          tip: s.tip
+        });
+
         improvements.push(`${s.name}: ${s.tip}`);
       }
     });
 
     const avg = sum / skills.length;
 
-    return { strengths, weaknesses, improvements, avg };
+    return {
+      strengths,
+      weaknesses,
+      improvements,
+      avg
+    };
   };
 
-  // 📄 PDF GENERATOR (FIXED PROFESSIONAL LAYOUT)
+  // 📄 PDF GENERATOR
   const generatePDF = async (player) => {
-    const ins = getInsights(player);
+        const ins = getInsights(player);
     const doc = new jsPDF("p", "mm", "a4");
 
     let y = 20;
@@ -74,7 +108,7 @@ export default function Reports() {
 
     y += 55;
 
-    // 🟢 STRENGTHS
+    // STRENGTHS
     doc.setFillColor(220, 252, 231);
     doc.rect(10, y - 8, 190, 10 + ins.strengths.length * 8, "F");
 
@@ -92,7 +126,7 @@ export default function Reports() {
 
     y += 5;
 
-    // 🔴 WEAKNESSES
+    // WEAKNESSES
     doc.setFillColor(254, 226, 226);
     doc.rect(10, y - 8, 190, 10 + ins.weaknesses.length * 15, "F");
 
@@ -110,13 +144,16 @@ export default function Reports() {
       y += 6;
 
       doc.setTextColor(75, 85, 99);
-      doc.text(`  → ${w.tip}`, 22, y, { maxWidth: 165 });
+      doc.text(`→ ${w.tip}`, 22, y, {
+        maxWidth: 165
+      });
+
       y += 10;
     });
 
     y += 5;
 
-    // 📈 IMPROVEMENTS
+    // IMPROVEMENT PLAN
     doc.setFillColor(254, 249, 195);
     doc.rect(10, y - 8, 190, 10 + ins.improvements.length * 8, "F");
 
@@ -129,11 +166,13 @@ export default function Reports() {
     doc.setFontSize(11);
 
     ins.improvements.forEach((i) => {
-      doc.text(`• ${i}`, 20, y, { maxWidth: 165 });
+      doc.text(`• ${i}`, 20, y, {
+        maxWidth: 165
+      });
+
       y += 7;
     });
-
-    // 📊 CHART PAGE
+        // CHART PAGE
     const chart = document.getElementById("chart-" + player.id);
 
     if (chart) {
@@ -156,7 +195,7 @@ export default function Reports() {
       doc.addImage(img, "PNG", 15, 30, 180, 180);
     }
 
-    // 🧠 FINAL VERDICT
+    // FINAL VERDICT
     doc.addPage();
 
     let verdict =
@@ -198,9 +237,9 @@ export default function Reports() {
             }}
           >
             <h2>🏏 {player.name}</h2>
+
             <p>⭐ Rating: {player.rating}/10</p>
 
-            {/* UI INSIGHTS */}
             <p style={{ color: "#22c55e" }}>
               🟢 Strengths: {ins.strengths.join(", ") || "None"}
             </p>
@@ -215,10 +254,10 @@ export default function Reports() {
             </p>
 
             <p style={{ color: "#facc15" }}>
-              📈 Improvements: {ins.improvements.join(", ") || "Balanced Player"}
+              📈 Improvements:
+              {ins.improvements.join(", ") || "Balanced Player"}
             </p>
 
-            {/* CHART */}
             <div
               id={"chart-" + player.id}
               style={{
@@ -231,7 +270,6 @@ export default function Reports() {
               <PlayerPieChart player={player} />
             </div>
 
-            {/* BUTTON */}
             <button
               onClick={() => generatePDF(player)}
               style={{

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function ComparePlayers() {
   const [players, setPlayers] = useState([]);
@@ -6,9 +8,20 @@ export default function ComparePlayers() {
   const [player2Id, setPlayer2Id] = useState("");
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("players")) || [];
-    setPlayers(data);
-  }, []);
+  const unsubscribe = onSnapshot(
+    collection(db, "players"),
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setPlayers(data);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
 
   const getPlayer = (id) =>
     players.find((p) => String(p.id) === String(id));
@@ -23,12 +36,14 @@ export default function ComparePlayers() {
   ];
 
   const getScore = (p) =>
-    p
-      ? (
+  p
+    ? Number(
+        (
           skills.reduce((sum, s) => sum + Number(p[s] || 0), 0) /
           skills.length
         ).toFixed(1)
-      : 0;
+      )
+    : 0;
 
   const getStrengths = (p) =>
     skills

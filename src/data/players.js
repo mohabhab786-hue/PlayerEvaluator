@@ -1,26 +1,15 @@
-export const players = [
-  {
-    id: 1,
-    name: "Virat Kohli",
-    role: "Batsman",
-    rating: 9
-  },
-  {
-    id: 2,
-    name: "Jasprit Bumrah",
-    role: "Bowler",
-    rating: 10
-  },
-  {
-    id: 3,
-    name: "Hardik Pandya",
-    role: "All-rounder",
-    rating: 8
-  },
-  {
-    id: 4,
-    name: "Rishabh Pant",
-    role: "Wicketkeeper",
-    rating: 8
-  }
-];
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+
+export const subscribeToPlayers = (callback) => {
+  const ref = collection(db, "players");
+
+  return onSnapshot(ref, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    callback(data);
+  });
+};

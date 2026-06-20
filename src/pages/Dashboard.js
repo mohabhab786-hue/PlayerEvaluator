@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import PieChartComp from "../components/PieChartComp";
 import BarChartComp from "../components/BarChartComp";
+import { subscribeToPlayers } from "../data/players";
 
 export default function Dashboard() {
   const [players, setPlayers] = useState([]);
 
+  // 🔥 Real-time Firebase sync
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("players")) || [];
-    setPlayers(data);
+    const unsubscribe = subscribeToPlayers(setPlayers);
+
+    return () => unsubscribe();
   }, []);
 
   const totalPlayers = players.length;

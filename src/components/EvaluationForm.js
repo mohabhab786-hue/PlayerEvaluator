@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { addPlayer } from "../utils/playerStorage";
 
 export default function EvaluationForm() {
   const [playerName, setPlayerName] = useState("");
@@ -12,25 +13,24 @@ export default function EvaluationForm() {
   const [competitiveness, setCompetitiveness] = useState(5);
   const [coachability, setCoachability] = useState(5);
 
-  const score =
+  const score = (
     (
-      (gameAwareness +
-        decisionMaking +
-        pressureHandling +
-        adaptability +
-        competitiveness +
-        coachability) /
-      6
-    ).toFixed(1);
+      gameAwareness +
+      decisionMaking +
+      pressureHandling +
+      adaptability +
+      competitiveness +
+      coachability
+    ) / 6
+  ).toFixed(1);
 
-  const savePlayer = () => {
+  const savePlayer = async () => {
     if (!playerName || !age) {
       alert("Please enter player details");
       return;
     }
 
     const player = {
-      id: Date.now(),
       name: playerName,
       age,
       role,
@@ -45,22 +45,25 @@ export default function EvaluationForm() {
       rating: Number(score)
     };
 
-    const existing = JSON.parse(localStorage.getItem("players")) || [];
-    existing.push(player);
-    localStorage.setItem("players", JSON.stringify(existing));
+    try {
+      await addPlayer(player);
 
-    alert("Player saved successfully!");
+      alert("Player saved successfully!");
 
-    setPlayerName("");
-    setAge("");
-    setRole("Batsman");
+      setPlayerName("");
+      setAge("");
+      setRole("Batsman");
 
-    setGameAwareness(5);
-    setDecisionMaking(5);
-    setPressureHandling(5);
-    setAdaptability(5);
-    setCompetitiveness(5);
-    setCoachability(5);
+      setGameAwareness(5);
+      setDecisionMaking(5);
+      setPressureHandling(5);
+      setAdaptability(5);
+      setCompetitiveness(5);
+      setCoachability(5);
+    } catch (error) {
+      console.error(error);
+      alert("Error saving player");
+    }
   };
 
   return (
@@ -92,7 +95,6 @@ export default function EvaluationForm() {
         <option>Wicketkeeper</option>
       </select>
 
-      {/* 🔥 FACTOR SLIDERS */}
       {[
         ["Game Awareness", gameAwareness, setGameAwareness],
         ["Decision Making", decisionMaking, setDecisionMaking],
