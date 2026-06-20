@@ -57,7 +57,9 @@ const renderCustomLabel = (props) => {
 };
 
 export default function PlayerPieChart({ player }) {
-  const isMobile = window.innerWidth < 600;
+  const isMobile =
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 600px)").matches;
 
   const data = [
     { name: "Game Awareness", value: Number(player.gameAwareness || 0) },
@@ -86,9 +88,9 @@ export default function PlayerPieChart({ player }) {
             dataKey="value"
             nameKey="name"
             cx="50%"
-            cy="50%"
+            cy={isMobile ? "45%" : "50%"}
             innerRadius={isMobile ? 40 : 70}
-            outerRadius={isMobile ? 85 : 120}
+            outerRadius={isMobile ? 70 : 120}
             paddingAngle={3}
             label={!isMobile ? renderCustomLabel : false}
             labelLine={false}
