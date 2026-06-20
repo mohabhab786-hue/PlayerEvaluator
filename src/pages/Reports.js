@@ -128,50 +128,60 @@ export default function Reports() {
 
     // WEAKNESSES
     doc.setFillColor(254, 226, 226);
-    doc.rect(10, y - 8, 190, 10 + ins.weaknesses.length * 15, "F");
+doc.rect(10, y - 8, 190, 10 + (ins.weaknesses.length || 1) * 15, "F");
 
-    doc.setTextColor(220, 38, 38);
-    doc.setFontSize(14);
-    doc.text("WEAKNESSES & FIX", 15, y);
+doc.setTextColor(220, 38, 38);
+doc.setFontSize(14);
+doc.text("WEAKNESSES & FIX", 15, y);
 
+y += 10;
+doc.setFontSize(11);
+
+if (ins.weaknesses.length === 0) {
+  doc.setTextColor(100);
+  doc.text("✔ No weaknesses found", 20, y);
+  y += 10;
+} else {
+  ins.weaknesses.forEach((w) => {
+    doc.setTextColor(185, 28, 28);
+    doc.text(`• ${w.name}`, 20, y);
+    y += 6;
+
+    doc.setTextColor(75, 85, 99);
+    doc.text(`→ ${w.tip}`, 22, y, { maxWidth: 165 });
     y += 10;
+  });
+}
 
-    doc.setFontSize(11);
+y += 5;
+    
 
-    ins.weaknesses.forEach((w) => {
-      doc.setTextColor(185, 28, 28);
-      doc.text(`• ${w.name}`, 20, y);
-      y += 6;
-
-      doc.setTextColor(75, 85, 99);
-      doc.text(`→ ${w.tip}`, 22, y, {
-        maxWidth: 165
-      });
-
-      y += 10;
-    });
-
-    y += 5;
+    
 
     // IMPROVEMENT PLAN
     doc.setFillColor(254, 249, 195);
-    doc.rect(10, y - 8, 190, 10 + ins.improvements.length * 8, "F");
+doc.rect(10, y - 8, 190, 10 + (ins.improvements.length || 1) * 8, "F");
 
+doc.setTextColor(161, 98, 7);
+doc.setFontSize(14);
+doc.text("IMPROVEMENT PLAN", 15, y);
+
+y += 10;
+doc.setFontSize(11);
+
+if (ins.improvements.length === 0) {
+  doc.setTextColor(100);
+  doc.text("✔ Balanced Player - No improvements required", 20, y);
+  y += 10;
+} else {
+  ins.improvements.forEach((i) => {
     doc.setTextColor(161, 98, 7);
-    doc.setFontSize(14);
-    doc.text("IMPROVEMENT PLAN", 15, y);
+    doc.text(`• ${i}`, 20, y, { maxWidth: 165 });
+    y += 7;
+  });
+}
 
-    y += 10;
-
-    doc.setFontSize(11);
-
-    ins.improvements.forEach((i) => {
-      doc.text(`• ${i}`, 20, y, {
-        maxWidth: 165
-      });
-
-      y += 7;
-    });
+y += 5;
         // CHART PAGE
     const chart = document.getElementById("chart-" + player.id);
 

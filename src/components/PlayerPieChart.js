@@ -86,11 +86,11 @@ export default function PlayerPieChart({ player }) {
             dataKey="value"
             nameKey="name"
             cx="50%"
-            cy="45%"
+            cy="50%"
             innerRadius={isMobile ? 40 : 70}
-            outerRadius={isMobile ? 70 : 120}
+            outerRadius={isMobile ? 85 : 120}
             paddingAngle={3}
-            label={renderCustomLabel}
+            label={!isMobile ? renderCustomLabel : false}
             labelLine={false}
           >
             {data.map((entry, index) => (
