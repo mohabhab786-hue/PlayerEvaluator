@@ -16,44 +16,67 @@ const COLORS = [
   "#14B8A6"
 ];
 
+// ✅ CLEAN ARROW LABEL
+const renderCustomLabel = (props) => {
+  const RADIAN = Math.PI / 180;
+  const { cx, cy, midAngle, outerRadius, name, value } = props;
+
+  const sin = Math.sin(-RADIAN * midAngle);
+  const cos = Math.cos(-RADIAN * midAngle);
+
+  const sx = cx + outerRadius * cos;
+  const sy = cy + outerRadius * sin;
+
+  const mx = cx + (outerRadius + 12) * cos;
+  const my = cy + (outerRadius + 12) * sin;
+
+  const ex = mx + (cos >= 0 ? 18 : -18);
+  const ey = my;
+
+  const textAnchor = cos >= 0 ? "start" : "end";
+
+  return (
+    <g>
+      <path
+        d={`M${sx},${sy} L${mx},${my} L${ex},${ey}`}
+        stroke="#94a3b8"
+        strokeWidth={1.2}
+        fill="none"
+      />
+      <text
+        x={ex}
+        y={ey}
+        textAnchor={textAnchor}
+        fontSize={10}
+        fill="#111827"
+      >
+        {`${name}: ${value}`}
+      </text>
+    </g>
+  );
+};
+
 export default function PlayerPieChart({ player }) {
+  const isMobile = window.innerWidth < 600;
+
   const data = [
-    {
-      name: "Game Awareness",
-      value: Number(player.gameAwareness || 0)
-    },
-    {
-      name: "Decision Making",
-      value: Number(player.decisionMaking || 0)
-    },
-    {
-      name: "Pressure Handling",
-      value: Number(player.pressureHandling || 0)
-    },
-    {
-      name: "Adaptability",
-      value: Number(player.adaptability || 0)
-    },
-    {
-      name: "Competitiveness",
-      value: Number(player.competitiveness || 0)
-    },
-    {
-      name: "Coachability",
-      value: Number(player.coachability || 0)
-    }
+    { name: "Game Awareness", value: Number(player.gameAwareness || 0) },
+    { name: "Decision Making", value: Number(player.decisionMaking || 0) },
+    { name: "Pressure Handling", value: Number(player.pressureHandling || 0) },
+    { name: "Adaptability", value: Number(player.adaptability || 0) },
+    { name: "Competitiveness", value: Number(player.competitiveness || 0) },
+    { name: "Coachability", value: Number(player.coachability || 0) }
   ];
 
   return (
     <div
       style={{
         width: "100%",
-        height: "420px",          // ✅ FIXED (mobile safe)
-        maxWidth: "100%",
-        background: "#ffffff",
+        height: isMobile ? "320px" : "450px",
+        background: "#fff",
         borderRadius: "20px",
-        padding: "15px",
-        overflow: "hidden"        // ✅ prevents cutting
+        padding: "10px",
+        overflow: "hidden"
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
@@ -63,34 +86,24 @@ export default function PlayerPieChart({ player }) {
             dataKey="value"
             nameKey="name"
             cx="50%"
-            cy="40%"                // ✅ slightly adjusted
-            innerRadius="40%"       // ✅ responsive
-            outerRadius="70%"       // ✅ responsive (FIX MAIN ISSUE)
+            cy="45%"
+            innerRadius={isMobile ? 40 : 70}
+            outerRadius={isMobile ? 70 : 120}
             paddingAngle={3}
-            label={false}           // ✅ prevents mobile cut
+            label={renderCustomLabel}
             labelLine={false}
           >
             {data.map((entry, index) => (
-              <Cell
-                key={index}
-                fill={COLORS[index % COLORS.length]}
-              />
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
 
-          <Tooltip formatter={(value) => [`${value}/10`, "Score"]} />
+          <Tooltip formatter={(v) => [`${v}/10`, "Score"]} />
 
           <Legend
             verticalAlign="bottom"
-            align="center"
-            layout="horizontal"
             iconType="circle"
-            wrapperStyle={{
-              paddingTop: "10px",
-              fontSize: "12px",
-              fontWeight: "bold",
-              color: "#000"
-            }}
+            wrapperStyle={{ fontSize: "11px" }}
           />
         </PieChart>
       </ResponsiveContainer>

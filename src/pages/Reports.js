@@ -192,14 +192,7 @@ export default function Reports() {
       doc.setFontSize(16);
       doc.text(`${player.name} Performance Chart`, 45, 15);
 
-      const pageWidth = doc.internal.pageSize.getWidth();
-
-const imgProps = doc.getImageProperties(img);
-
-const pdfWidth = pageWidth - 20;
-const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-doc.addImage(img, "PNG", 10, 30, pdfWidth, pdfHeight);
+      doc.addImage(img, "PNG", 15, 30, 180, 180);
     }
 
     // FINAL VERDICT
@@ -207,7 +200,7 @@ doc.addImage(img, "PNG", 10, 30, pdfWidth, pdfHeight);
 
     let verdict =
       player.rating >= 8
-        ? "ELITE PLAYER - IPL READY"
+        ? "ELITE PLAYER - BALANCED SKILLS"
         : player.rating >= 6
         ? "GOOD POTENTIAL - NEEDS TRAINING"
         : "DEVELOPMENT REQUIRED";
@@ -297,4 +290,4 @@ doc.addImage(img, "PNG", 10, 30, pdfWidth, pdfHeight);
       })}
     </div>
   );
-}
+}                   
