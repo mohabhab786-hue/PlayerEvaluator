@@ -192,7 +192,14 @@ export default function Reports() {
       doc.setFontSize(16);
       doc.text(`${player.name} Performance Chart`, 45, 15);
 
-      doc.addImage(img, "PNG", 15, 30, 180, 180);
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+const imgProps = doc.getImageProperties(img);
+
+const pdfWidth = pageWidth - 20;
+const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+doc.addImage(img, "PNG", 10, 30, pdfWidth, pdfHeight);
     }
 
     // FINAL VERDICT

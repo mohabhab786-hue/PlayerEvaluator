@@ -48,10 +48,12 @@ export default function PlayerPieChart({ player }) {
     <div
       style={{
         width: "100%",
-        height: "650px",
+        height: "420px",          // ✅ FIXED (mobile safe)
+        maxWidth: "100%",
         background: "#ffffff",
         borderRadius: "20px",
-        padding: "20px"
+        padding: "15px",
+        overflow: "hidden"        // ✅ prevents cutting
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
@@ -61,12 +63,12 @@ export default function PlayerPieChart({ player }) {
             dataKey="value"
             nameKey="name"
             cx="50%"
-            cy="40%"
-            innerRadius={70}
-            outerRadius={150}
+            cy="40%"                // ✅ slightly adjusted
+            innerRadius="40%"       // ✅ responsive
+            outerRadius="70%"       // ✅ responsive (FIX MAIN ISSUE)
             paddingAngle={3}
-            label={({ name, value }) => `${name}: ${value}`}
-            labelLine={true}
+            label={false}           // ✅ prevents mobile cut
+            labelLine={false}
           >
             {data.map((entry, index) => (
               <Cell
@@ -76,9 +78,7 @@ export default function PlayerPieChart({ player }) {
             ))}
           </Pie>
 
-          <Tooltip
-            formatter={(value) => [`${value}/10`, "Score"]}
-          />
+          <Tooltip formatter={(value) => [`${value}/10`, "Score"]} />
 
           <Legend
             verticalAlign="bottom"
@@ -86,8 +86,8 @@ export default function PlayerPieChart({ player }) {
             layout="horizontal"
             iconType="circle"
             wrapperStyle={{
-              paddingTop: "50px",
-              fontSize: "15px",
+              paddingTop: "10px",
+              fontSize: "12px",
               fontWeight: "bold",
               color: "#000"
             }}
